@@ -1,10 +1,11 @@
+import express, { Request, Response } from "express";
 import { Cards } from "../models/cards";
 import verifyToken from "../middleware/token";
 import boosterpack from "../middleware/booster";
 
 const store = new Cards();
 
-const booster = async (req, res) => {
+const booster = async (req: Request, res: Response) => {
   try {
     const pack = boosterpack();
     const cards = await store.booster(pack);
@@ -14,7 +15,7 @@ const booster = async (req, res) => {
   }
 };
 
-const card_routes = (app) => {
+const card_routes = (app: express.Application) => {
   app.get("/booster", verifyToken, booster);
 };
 

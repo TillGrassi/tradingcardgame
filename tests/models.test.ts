@@ -1,5 +1,4 @@
 import { Users } from "../models/user";
-import client from "../database";
 
 const testUser = {
   username: "testuser",
@@ -9,15 +8,12 @@ const testUser = {
 //Users
 describe("test users model methods", () => {
   const store = new Users();
-  afterAll(() => {
-    client.end();
-  });
 
   describe("test create/authenticate method", () => {
     it("creates and authenticates a new user", async () => {
       await store.create(testUser);
       const login = await store.authenticate(testUser);
-      expect(login.username).toEqual("testuser");
+      expect(login?.username).toEqual("testuser");
     });
   });
 

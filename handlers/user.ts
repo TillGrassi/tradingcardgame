@@ -1,5 +1,6 @@
+import express, { Request, Response } from "express";
 import { Users } from "../models/user";
-import jwt from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 import dotenv from "dotenv";
 import verifyToken from "../middleware/token";
 
@@ -7,7 +8,7 @@ dotenv.config();
 
 const store = new Users();
 
-const show = async (req, res) => {
+const show = async (req: Request, res: Response) => {
   try {
     const username = req.params.username;
     const user = await store.show(username);
@@ -17,26 +18,26 @@ const show = async (req, res) => {
   }
 };
 
-const create = async (req, res) => {
+const create = async (req: Request, res: Response) => {
   try {
-    const username = req.body.username;
-    const password = req.body.password;
+    const username: string = req.body.username;
+    const password: string = req.body.password;
     const user = {
       username,
       password,
     };
     const newUser = await store.create(user);
-    const token = jwt.sign({ user: newUser }, process.env.TOKEN_SECRET);
+    const token = jwt.sign({ user: newUser }, process.env.TOKEN_SECRET as Secret);
     res.json(token);
   } catch (err) {
     throw new Error(`Could not create user ${req.body.username}}: ${err}`);
   }
 };
 
-const authenticate = async (req, res) => {
+const authenticate = async (req: Request, res: Response) => {
   try {
-    const username = req.body.username;
-    const password = req.body.password;
+    const username: string = req.body.username;
+    const password: string = req.body.password;
     const user = {
       username,
       password,
@@ -48,7 +49,7 @@ const authenticate = async (req, res) => {
   }
 };
 
-const user_routes = (app) => {
+const user_routes = (app: express.Application) => {
   app.get("/users/:username", verifyToken, show);
   app.post("/users", create);
   app.post("/users/login", verifyToken, authenticate);

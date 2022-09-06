@@ -1,9 +1,10 @@
-import { User_Cards } from "../models/user_cards";
+import express, { Request, Response } from "express";
+import { User_Cards, InputPack } from "../models/user_cards";
 import verifyToken from "../middleware/token";
 
 const store = new User_Cards();
 
-const collection = async (res, req) => {
+const collection = async (req: Request, res: Response) => {
   try {
     const username = req.params.username;
     const cards = await store.collection(username);
@@ -15,9 +16,9 @@ const collection = async (res, req) => {
   }
 };
 
-const addCards = async (res, req) => {
+const addCards = async (req: Request, res: Response) => {
   try {
-    const pack = {
+    const pack: InputPack = {
       username: req.body.username,
       card1: req.body.card1,
       card2: req.body.card2,
@@ -34,7 +35,7 @@ const addCards = async (res, req) => {
   }
 };
 
-const user_cards_routes = (app) => {
+const user_cards_routes = (app: express.Application) => {
   app.get("/collection", verifyToken, collection);
   app.post("/addCards", verifyToken, addCards);
 };

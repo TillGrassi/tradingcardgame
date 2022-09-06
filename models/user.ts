@@ -2,22 +2,28 @@ import client from "../database";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
+export type User = {
+  id?: number,
+  username: string,
+  password: string
+}
+
 dotenv.config();
 const { BCRYPT_PASSWORD, SALT_ROUNDS } = process.env;
 
-const pepper = BCRYPT_PASSWORD;
-const saltRounds = SALT_ROUNDS;
+const pepper: string = BCRYPT_PASSWORD as string;
+const saltRounds: string = SALT_ROUNDS as string;
 
 export class Users {
-  async show(username) {
+  async show(username: string): Promise<User> {
     try {
       const sql = "SELECT * FROM users WHERE username=($1)";
-
+      // @ts-ignore
       const conn = await client.connect();
 
       const result = await conn.query(sql, [username]);
 
-      conn.release();
+      conn.end();
 
       return result.rows[0];
     } catch (err) {
@@ -25,19 +31,19 @@ export class Users {
     }
   }
 
-  async create(u) {
+  async create(u: User): Promise<User> {
     try {
       const sql =
         "INSERT INTO users (username, password) VALUES($1, $2) RETURNING *";
       const hash = bcrypt.hashSync(u.password + pepper, parseInt(saltRounds));
-
+      // @ts-ignore
       const conn = await client.connect();
 
       const result = await conn.query(sql, [u.username, hash]);
 
       const user = result.rows[0];
 
-      conn.release();
+      conn.end();
 
       return user;
     } catch (err) {
@@ -45,7 +51,8 @@ export class Users {
     }
   }
 
-  async authenticate(user) {
+  async authenticate(user: User): Promise<User | null> {
+    // @ts-ignore
     const conn = await client.connect();
     const sql = "SELECT * FROM users WHERE username=($1)";
 
@@ -55,9 +62,11 @@ export class Users {
       const control = result.rows[0];
 
       if (bcrypt.compareSync(user.password + pepper, control.password)) {
+        conn.end();
         return user;
       }
     }
+    conn.end();
     return null;
   }
 }
