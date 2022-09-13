@@ -12,7 +12,7 @@ export type InputPack = {
 export class User_Cards {
   async collection(username: string): Promise<[]> {
     try {
-      const sql = "SELECT * FROM user_cards WHERE username=($1)";
+      const sql = "SELECT * FROM cards INNER JOIN user_cards ON cards.id = user_cards.card WHERE username=($1)";
       // @ts-ignore
       const conn = await client.connect();
 

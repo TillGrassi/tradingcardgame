@@ -8,7 +8,7 @@ const database_1 = __importDefault(require("../database"));
 class User_Cards {
     async collection(username) {
         try {
-            const sql = "SELECT * FROM user_cards WHERE username=($1)";
+            const sql = "SELECT * FROM cards INNER JOIN user_cards ON cards.id = user_cards.card WHERE username=($1)";
             // @ts-ignore
             const conn = await database_1.default.connect();
             const result = await conn.query(sql, [username]);
