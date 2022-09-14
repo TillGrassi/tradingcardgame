@@ -10,15 +10,15 @@ export type InputPack = {
 }
 
 export class User_Cards {
-  async collection(username: string): Promise<[]> {
+  async collection(username: string): Promise<any[]> {
     try {
-      const sql = "SELECT * FROM user_cards WHERE username=($1)";
+      const sql = "SELECT * FROM cards INNER JOIN user_cards ON cards.id = user_cards.card WHERE username=($1)";
       // @ts-ignore
       const conn = await client.connect();
 
       const result = await conn.query(sql, [username]);
 
-      conn.end();
+      conn.release();
 
       return result.rows;
     } catch (err) {
@@ -26,7 +26,7 @@ export class User_Cards {
     }
   }
 
-  async addCards(pack: InputPack): Promise<[]> {
+  async addCards(pack: InputPack): Promise<boolean> {
     const { username, card1, card2, card3, card4, card5 } = pack;
     try {
       const sql =
@@ -43,9 +43,9 @@ export class User_Cards {
         card5,
       ]);
 
-      conn.end();
+      conn.release();
 
-      return result.rows;
+      return true;
     } catch (err) {
       throw new Error(
         `Could not add cards to collection of ${username}. Error: ${err}`

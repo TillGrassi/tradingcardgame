@@ -18,7 +18,7 @@ class Users {
             // @ts-ignore
             const conn = await database_1.default.connect();
             const result = await conn.query(sql, [username]);
-            conn.end();
+            conn.release();
             return result.rows[0];
         }
         catch (err) {
@@ -33,7 +33,7 @@ class Users {
             const conn = await database_1.default.connect();
             const result = await conn.query(sql, [u.username, hash]);
             const user = result.rows[0];
-            conn.end();
+            conn.release();
             return user;
         }
         catch (err) {
@@ -48,11 +48,11 @@ class Users {
         if (result.rows.length) {
             const control = result.rows[0];
             if (bcrypt_1.default.compareSync(user.password + pepper, control.password)) {
-                conn.end();
+                conn.release();
                 return user;
             }
         }
-        conn.end();
+        conn.release();
         return null;
     }
 }

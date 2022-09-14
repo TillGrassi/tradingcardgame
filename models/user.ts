@@ -23,7 +23,7 @@ export class Users {
 
       const result = await conn.query(sql, [username]);
 
-      conn.end();
+      conn.release();
 
       return result.rows[0];
     } catch (err) {
@@ -43,7 +43,7 @@ export class Users {
 
       const user = result.rows[0];
 
-      conn.end();
+      conn.release();
 
       return user;
     } catch (err) {
@@ -62,11 +62,11 @@ export class Users {
       const control = result.rows[0];
 
       if (bcrypt.compareSync(user.password + pepper, control.password)) {
-        conn.end();
+        conn.release();
         return user;
       }
     }
-    conn.end();
+    conn.release();
     return null;
   }
 }

@@ -9,16 +9,16 @@ export type Pack = {
 }
 
 export class Cards {
-  async booster(pack: Pack): Promise<[]> {
+  async booster(pack: Pack): Promise<Pack[]> {
     try {
       const { one, two, three, four, five } = pack;
-      const sql = "SELECT * FROM cards WHERE id=($1, $2, $3, $4, $5)";
+      const sql = "SELECT * FROM cards WHERE id IN ($1, $2, $3, $4, $5)";
       // @ts-ignore
       const conn = await client.connect();
 
       const result = await conn.query(sql, [one, two, three, four, five]);
 
-      conn.end();
+      conn.release();
 
       return result.rows;
     } catch (err) {

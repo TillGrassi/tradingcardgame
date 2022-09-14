@@ -1,39 +1,20 @@
-import createError from "http-errors";
-import express, { Request, Response} from "express";
-import path from "path";
-import cookieParser from "cookie-parser";
-import logger from "morgan";
+import express, { Request, Response } from 'express'
+import bodyParser from 'body-parser'
 import user_routes from "./handlers/user";
 import card_routes from "./handlers/cards";
 import user_cards_routes from "./handlers/user_cards";
 
-const app = express();
+const app: express.Application = express()
+const address: string = "0.0.0.0:4000"
 
+app.use(bodyParser.json())
 
-app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.listen(4000, function () {
+    console.log(`starting app on: ${address}`)
+})
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function (err: any, req: Request, res: Response, next: () => void) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
-});
-
-user_routes(app);
 card_routes(app);
+user_routes(app);
 user_cards_routes(app);
 
-export default app;
+export default app

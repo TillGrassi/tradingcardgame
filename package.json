@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www.ts",
+    "start": "nodemon app.ts",
     "test": "db-migrate db:create test_tcg && cross-env NODE_ENV=test db-migrate --env test up && jest && db-migrate db:drop test_tcg",
     "tsc": "tsc",
     "build": "tsc --build"
@@ -12,7 +12,9 @@
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     },
-    "modulePathIgnorePatterns": ["<rootDir>/tests"]
+    "modulePathIgnorePatterns": [
+      "<rootDir>/tests"
+    ]
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -22,6 +24,7 @@
     "db-migrate-pg": "^1.2.2",
     "debug": "~2.6.9",
     "dotenv": "^16.0.1",
+    "ejs": "^3.1.8",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",

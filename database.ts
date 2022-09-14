@@ -3,7 +3,7 @@ import { Pool } from "pg";
 
 dotenv.config();
 
-let client: any;
+let client: Pool | undefined;
 
 const {
   POSTGRES_HOST,
