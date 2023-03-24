@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const pg_1 = require("pg");
 dotenv_1.default.config();
-let client;
 const { POSTGRES_HOST, POSTGRES_DB, POSTGRES_TEST_DB, POSTGRES_USER, POSTGRES_PASSWORD, NODE_ENV, } = process.env;
+let client;
 if (NODE_ENV === "dev") {
     client = new pg_1.Pool({
         host: POSTGRES_HOST,
@@ -16,7 +16,7 @@ if (NODE_ENV === "dev") {
         password: POSTGRES_PASSWORD,
     });
 }
-if (NODE_ENV === "test") {
+else if (NODE_ENV === "test") {
     client = new pg_1.Pool({
         host: POSTGRES_HOST,
         database: POSTGRES_TEST_DB,
@@ -24,5 +24,8 @@ if (NODE_ENV === "test") {
         password: POSTGRES_PASSWORD,
         allowExitOnIdle: true,
     });
+}
+else {
+    throw new Error(`Invalid NODE_ENV: ${NODE_ENV}`);
 }
 exports.default = client;

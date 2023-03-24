@@ -35,9 +35,21 @@ const addCards = async (req: Request, res: Response) => {
   }
 };
 
+const deleteCard = async (req: Request, res: Response) => {
+  try {
+    const result = await store.deleteCard(req.body.username, req.body.card);
+    res.json(result);
+  } catch (err) {
+    throw new Error(
+      `Could not delete card from collection of user ${req.body.username}: ${err}`
+    );
+  }
+}
+
 const user_cards_routes = (app: express.Application) => {
-  app.get("/collection", verifyToken, collection);
+  app.get("/collection:username", verifyToken, collection);
   app.post("/addCards", verifyToken, addCards);
+  app.post("/deleteCard", verifyToken, deleteCard);
 };
 
 export default user_cards_routes;

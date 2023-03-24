@@ -53,6 +53,6 @@ const authenticate = async (req, res) => {
 const user_routes = (app) => {
     app.get("/users/:username", token_1.default, show);
     app.post("/users", create);
-    app.post("/users/login", token_1.default, authenticate);
+    app.post("/users/login", authenticate);
 };
 exports.default = user_routes;

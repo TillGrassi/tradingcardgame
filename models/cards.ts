@@ -1,4 +1,4 @@
-import client from "../database";
+import client from "../db";
 
 export type Pack = {
   one: number,
@@ -12,7 +12,16 @@ export class Cards {
   async booster(pack: Pack): Promise<Pack[]> {
     try {
       const { one, two, three, four, five } = pack;
-      const sql = "SELECT * FROM cards WHERE id IN ($1, $2, $3, $4, $5)";
+      const sql = `SELECT c.*
+      FROM cards c
+      INNER JOIN (
+          VALUES
+              ($1::INTEGER),
+              ($2::INTEGER),
+              ($3::INTEGER),
+              ($4::INTEGER),
+              ($5::INTEGER)
+      ) AS v(id) ON c.id = v.id`;
       // @ts-ignore
       const conn = await client.connect();
 
@@ -22,7 +31,8 @@ export class Cards {
 
       return result.rows;
     } catch (err) {
-      throw new Error(`Could not find cards. Error: ${err}`);
+      // @ts-ignore
+      throw new Error(`Could not find cards. Error: ${err.stack}`);
     }
   }
 }

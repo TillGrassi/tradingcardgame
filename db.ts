@@ -3,8 +3,6 @@ import { Pool } from "pg";
 
 dotenv.config();
 
-let client: Pool | undefined;
-
 const {
   POSTGRES_HOST,
   POSTGRES_DB,
@@ -14,6 +12,8 @@ const {
   NODE_ENV,
 } = process.env;
 
+let client: Pool;
+
 if (NODE_ENV === "dev") {
   client = new Pool({
     host: POSTGRES_HOST,
@@ -21,9 +21,7 @@ if (NODE_ENV === "dev") {
     user: POSTGRES_USER,
     password: POSTGRES_PASSWORD,
   });
-}
-
-if (NODE_ENV === "test") {
+} else if (NODE_ENV === "test") {
   client = new Pool({
     host: POSTGRES_HOST,
     database: POSTGRES_TEST_DB,
@@ -31,6 +29,8 @@ if (NODE_ENV === "test") {
     password: POSTGRES_PASSWORD,
     allowExitOnIdle: true,
   });
+} else {
+  throw new Error(`Invalid NODE_ENV: ${NODE_ENV}`);
 }
 
 export default client;

@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { Cards } from "../models/cards";
 import verifyToken from "../middleware/token";
-import boosterpack from "../middleware/booster";
+import boosterpack from "../utils/booster";
 
 const store = new Cards();
 

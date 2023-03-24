@@ -3,23 +3,164 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const http_1 = __importDefault(require("http"));
 const app_1 = __importDefault(require("../app"));
-const supertest_1 = __importDefault(require("supertest"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const request = (0, supertest_1.default)(app_1.default);
 const testUser = {
-    username: 'testuser2',
-    password: 'password123'
+    username: "testuser2",
+    password: "password123",
 };
 const token = jsonwebtoken_1.default.sign({ user: testUser }, process.env.TOKEN_SECRET);
-//Users
+let server;
+beforeAll((done) => {
+    server = http_1.default.createServer(app_1.default);
+    server.listen(8081, done);
+});
+afterAll((done) => {
+    server.close(done);
+});
 describe("users api works", () => {
     describe("POST /users creates a new user", () => {
-        it("returns statuscode 200", async () => {
-            const result = await request.post('http://localhost:4000/users').send({ username: 'testuser2', password: 'password123' });
-            expect(result.status).toBe(200);
+        it("returns statuscode 200", (done) => {
+            const request = http_1.default.request({
+                hostname: "localhost",
+                port: 8081,
+                path: "/users",
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }, (res) => {
+                expect(res.statusCode).toBe(200);
+                done();
+            });
+            request.write(JSON.stringify({ username: "testuser2", password: "password123" }));
+            request.end();
         });
+    });
+});
+describe("GET /users/:username returns user info", () => {
+    it("returns statuscode 200", (done) => {
+        const request = http_1.default.request({
+            hostname: "localhost",
+            port: 8081,
+            path: "/users/testuser2",
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+        }, (res) => {
+            expect(res.statusCode).toBe(200);
+            done();
+        });
+        request.end();
+    });
+});
+describe("POST /users/login authenticates a user", () => {
+    it("returns statuscode 200", (done) => {
+        const request = http_1.default.request({
+            hostname: "localhost",
+            port: 8081,
+            path: "/users/login",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+        }, (res) => {
+            expect(res.statusCode).toBe(200);
+            done();
+        });
+        request.write(JSON.stringify({ username: "testuser2", password: "password123" }));
+        request.end();
+    });
+});
+describe("GET /booster returns a new booster pack", () => {
+    it("returns statuscode 200", (done) => {
+        const request = http_1.default.request({
+            hostname: "localhost",
+            port: 8081,
+            path: "/booster",
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+        }, (res) => {
+            expect(res.statusCode).toBe(200);
+            done();
+        });
+        request.end();
+    });
+});
+describe("user cards api works", () => {
+    describe("GET /collection returns the user's card collection", () => {
+        it("returns status code 200 and an array of cards", (done) => {
+            const request = http_1.default.request({
+                hostname: "localhost",
+                port: 8081,
+                path: "/collection?username=testuser2",
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            }, (res) => {
+                let data = "";
+                res.on("data", (chunk) => {
+                    data += chunk;
+                });
+                res.on("end", () => {
+                    expect(res.statusCode).toBe(200);
+                    expect(Array.isArray(JSON.parse(data))).toBe(true);
+                    done();
+                });
+            });
+            request.end();
+        });
+    });
+});
+describe("POST /addCards adds cards to the user's collection", () => {
+    it("returns status code 200 and an object with the new collection", (done) => {
+        const request = http_1.default.request({
+            hostname: "localhost",
+            port: 8081,
+            path: "/addCards",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        }, (res) => {
+            let data = "";
+            res.on("data", (chunk) => {
+                data += chunk;
+            });
+            res.on("end", () => {
+                expect(res.statusCode).toBe(200);
+                const response = JSON.parse(data);
+                expect(response).toMatchObject({
+                    username: "testuser2",
+                    card1: 1,
+                    card2: 2,
+                    card3: 3,
+                    card4: 4,
+                    card5: 5
+                });
+                done();
+            });
+        });
+        request.write(JSON.stringify({
+            username: "testuser2",
+            card1: 1,
+            card2: 2,
+            card3: 3,
+            card4: 4,
+            card5: 5,
+        }));
+        request.end();
     });
 });
